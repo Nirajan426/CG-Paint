@@ -7,6 +7,7 @@ are preserved exactly. Only the UI layer is replaced with PyQt6 + QPainter.
 import sys
 import math
 import os
+import subprocess
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QToolBar, QStatusBar,
     QDockWidget, QLabel, QPushButton, QSlider, QColorDialog,
@@ -479,6 +480,10 @@ class CGPaintQt(QMainWindow):
         # Help
         hm = mb.addMenu("Help")
         self._action(hm, "About / Shortcuts", "", self._help_dialog)
+
+        # Games
+        gm = mb.addMenu("Games")
+        self._action(gm, "Play CG-io", "", self.launch_cg_io)
 
     def _action(self, menu, label, shortcut, slot):
         act = QAction(label, self)
@@ -1337,6 +1342,21 @@ class CGPaintQt(QMainWindow):
             "• Left-click palette = foreground\n"
             "• Right-click palette = background"
         )
+
+    def launch_cg_io(self):
+        """Launches the Pygame app as a separate independent process."""
+        try:
+            # sys.executable ensures it uses the same python interpreter running the paint app
+            subprocess.Popen([sys.executable, "Acroll.py"])
+            
+            # Show a temporary 3-second message in the PyQt6 status bar
+            self.statusBar().showMessage("Acroll Launched Successfully!", 3000)
+        except Exception as e:
+            QMessageBox.critical(
+                self, 
+                "Launch Error", 
+                f"Could not launch the game.\nMake sure 'Acroll.py' is in the same folder.\n\nError: {e}"
+            )
 
 
 # ======================== Entry Point ========================
